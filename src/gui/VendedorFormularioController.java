@@ -6,8 +6,12 @@ import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
 import java.net.URL;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -16,6 +20,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entidades.Vendedor;
@@ -37,7 +42,25 @@ public class VendedorFormularioController implements Initializable {
     private TextField txtNome;
 
     @FXML
-    private Label lblErro;
+    private TextField txtEmail;
+
+    @FXML
+    private DatePicker dpDataNascimento;
+
+    @FXML
+    private TextField txtSalarioBase;
+
+    @FXML
+    private Label lblErroNome;
+
+    @FXML
+    private Label lblErroEmail;
+
+    @FXML
+    private Label lblErroDataNascimento;
+
+    @FXML
+    private Label lblErroSalarioBase;
 
     @FXML
     private Button btnSalvar;
@@ -91,7 +114,10 @@ public class VendedorFormularioController implements Initializable {
 
     private void initializeNodes() {
         Constraints.setTextFieldInteger(txtID);
-        Constraints.setTextFieldMaxLength(txtNome, 30);
+        Constraints.setTextFieldMaxLength(txtNome, 70);
+        Constraints.setTextFieldDouble(txtSalarioBase);
+        Constraints.setTextFieldMaxLength(txtEmail, 100);
+        Utils.formatDatePicker(dpDataNascimento, "dd/MM/yyyy");
     }
 
     public void updateFormData() {
@@ -100,6 +126,13 @@ public class VendedorFormularioController implements Initializable {
         }
         txtID.setText(String.valueOf(entidade.getId()));
         txtNome.setText(entidade.getNome());
+        txtEmail.setText(entidade.getEmail());
+        Locale.setDefault(Locale.US);
+        txtSalarioBase.setText(String.format("%.2f", entidade.getSalarioBase()));
+        if (entidade.getDataNascimento() != null) {
+            dpDataNascimento.setValue(LocalDate.ofInstant(entidade.getDataNascimento().toInstant(), ZoneId.systemDefault()));
+        }
+
     }
 
     private Vendedor getFormData() {
@@ -135,7 +168,7 @@ public class VendedorFormularioController implements Initializable {
         Set<String> campos = erros.keySet();
 
         if (campos.contains("nome")) {
-            lblErro.setText(erros.get("nome"));
+            lblErroNome.setText(erros.get("nome"));
         }
 
     }
